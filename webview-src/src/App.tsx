@@ -1,10 +1,7 @@
 // import React from 'react';
-import { DefaultSizeStyle, STROKE_SIZES, TLUiOverrides, TLComponents, Tldraw } from 'tldraw'
+import { DefaultSizeStyle, TLUiOverrides, TLComponents, Tldraw } from 'tldraw'
+import { applySmallStrokeWidth, configurableShapeUtils } from './smallStrokeWidth'
 import 'tldraw/tldraw.css'
-
-// Shared by the canvas and SVG exporter in tldraw 3.5.1.
-// Freehand rendering adds 1 to this base width (0.5 + 1 = 1.5).
-STROKE_SIZES.s = 0.5
 
 ////////////////////lzstring////////////////////
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
@@ -83,6 +80,9 @@ globalThis.addEventListener('message', event => {
       || event.detail; // for debug in chrome
   
     switch (message.command) {
+      case 'settings':
+        applySmallStrokeWidth(message.smallStrokeWidth);
+        break;
       case 'currentLine':
         drawAPI.unstable.setContent(message.content);
         break;
@@ -115,6 +115,7 @@ globalThis.addEventListener('message', event => {
       vscode.postMessage({ command: 'requestCurrentLine' })
       vscode.postMessage({ command: 'requestCustom' })
       globalThis.editor_mounted=()=>{
+        vscode.postMessage({ command: 'requestSettings' })
         vscode.postMessage({ command: 'requestCurrentLine' })
       }
     }
@@ -214,6 +215,7 @@ const App = () => {
         <div>
             <div style={{ position: 'fixed', inset: 0 }}>
                 <Tldraw 
+                    shapeUtils={configurableShapeUtils}
                     components={components}
                     onMount={(editor) => {
                         globalThis.editor_g = editor

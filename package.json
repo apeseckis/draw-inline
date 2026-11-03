@@ -50,6 +50,12 @@
 			"type": "object",
 			"title": "Draw Inline",
 			"properties": {
+				"draw-inline.smallStrokeWidth": {
+					"type": "number",
+					"default": 0.5,
+					"exclusiveMinimum": 0,
+					"description": "Base width of S strokes. Freehand rendering adds 1 to this value. Applies immediately to existing S shapes and SVG exports; M, L and XL are unchanged."
+				},
 				"draw-inline.auto-folding": {
 					"type": "boolean",
 					"default": true,
@@ -64,6 +70,7 @@
 		}
 	},
 	"scripts": {
+		"test": "node --test --test-force-exit scripts/settings.test.cjs",
 		"build": "npm --prefix webview-src run build",
 		"vscode:prepublish": "npm run build",
 		"package": "npx --yes @vscode/vsce@4.1.0 package --out vscode-markdown-tldraw-inline-thin-stroke-0.1.0.vsix"

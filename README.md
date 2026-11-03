@@ -4,6 +4,8 @@
 
 Kūrimo, diegimo, patikros ir grįžimo prie originalo instrukcijos: [Plonesnis brūkšnys](docs/THIN-STROKE.lt.md).
 
+`S` storį galite keisti VS Code Settings nustatymu **Draw Inline: Small Stroke Width** (`draw-inline.smallStrokeWidth`, numatyta `0.5`). Pakeitimai taikomi atidarytam piešiniui ir SVG eksportui iškart, be perkompiliavimo.
+
 This project is a fork of [Draw Note (zhaouv/vscode-markdown-draw)](https://github.com/zhaouv/vscode-markdown-draw) and changes to [tldraw](https://github.com/tldraw/tldraw) as the whiteboard engine.
 
 ## Compared with the Official tldraw VSCode Extension

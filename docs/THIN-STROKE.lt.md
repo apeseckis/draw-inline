@@ -2,14 +2,16 @@
 
 ## Pakeitimai
 
-- `webview-src/src/App.tsx`: prieš kuriant redaktorių nustatoma `STROKE_SIZES.s = 0.5`. Kiti dydžiai lieka `M=3.5`, `L=5`, `XL=10`. `S` parenkamas redaktoriaus paleidimo metu ir po kiekvieno SVG momentinės kopijos įkėlimo. Vėliau dydį galima keisti įprastais valdikliais.
+- `webview-src/src/smallStrokeWidth.ts`: `S` bazinis plotis valdomas nustatymu, numatyta `0.5`. Pakeitus plotį atnaujinamas tldraw podėlis nekeičiant figūrų duomenų ar atšaukimo istorijos. Kiti dydžiai lieka `M=3.5`, `L=5`, `XL=10`.
+- `webview-src/src/App.tsx`: gauna nustatymą iš VS Code. `S` parenkamas redaktoriaus paleidimo metu ir po kiekvieno SVG momentinės kopijos įkėlimo. Vėliau dydį galima keisti įprastais valdikliais.
+- `src/extension.js`: perduoda nustatymą atidarius redaktorių ir pasikeitus VS Code konfigūracijai. Netinkama reikšmė pakeičiama numatytąja `0.5`.
 - `webview-src/package.json`: pašalinta Unix komanda `rm -rf`; `vite build --emptyOutDir` išvalo generuojamą `board` aplanką ir veikia Windows.
 - `webview-src/local_replace.js`: vietiniai tldraw ištekliai kopijuojami sinchroniškai; jei išteklių nėra arba URL pakeitimas nepavyksta, kūrimas sustabdomas su klaida.
 - `package.json`: bendros kūrimo ir pakavimo komandos, šios saugyklos adresai. Plėtinio ID lieka `zhaouv.vscode-markdown-tldraw-inline`, versija `0.1.0`.
 - `package-lock.json`: tik du nebegaliojančio sertifikato `registry.npm.taobao.org` adresai pakeisti į `registry.npmjs.org`. Versijos ir vientisumo reikšmės nepakeistos. Frontend užrakinimo failas nepakeistas; tldraw lieka `3.5.1`.
 - `scripts/verify-package.ps1`: VSIX turinio, sugeneruoto brūkšnio pakeitimo ir vietinių išteklių vientisumo patikra.
 
-SVG saugojimo formatas, suspausta tldraw momentinė kopija, backend komandos, klavišų kombinacijos ir nustatymai nepakeisti.
+SVG saugojimo formatas, suspausta tldraw momentinė kopija, esamos komandos, klavišų kombinacijos ir ankstesni nustatymai nepakeisti.
 
 ## Pločio reikšmė ir seni piešiniai
 
@@ -26,6 +28,7 @@ PowerShell, projekto šaknyje:
 ```powershell
 npm.cmd ci
 npm.cmd --prefix webview-src ci
+npm.cmd test
 npm.cmd run package
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-package.ps1
 ```
@@ -70,9 +73,21 @@ ID ir versija sutampa su originalu, todėl vien versijos numeris modifikacijos n
 
 Kūrimas ir paketo turinys tikrinami automatiškai. Šis rankinis VS Code bandymas dar neatliktas; automatinė paketo patikra nepatvirtina visos sąveikos su VS Code ar vaizdinio rezultato.
 
-## Kaip vėliau pakeisti plotį
+## Kaip pakeisti plotį per VS Code Settings
 
-Faile `webview-src/src/App.tsx` pakeiskite vieną eilutę, pvz., `STROKE_SIZES.s = 0.75`, tada vykdykite `npm.cmd run package` ir įdiekite naują VSIX su `--force`. Atnaujinkite patikros skripto tikėtiną reikšmę ir šias pastabas. Kitų dydžių ar momentinių kopijų keisti nereikia.
+Vieną kartą įdiekite atnaujintą VSIX ir vykdykite **Developer: Reload Window**. Tada atverkite Settings (`Ctrl+,`) ir ieškokite `@id:draw-inline.smallStrokeWidth` arba **Draw Inline: Small Stroke Width**. Galite keisti User arba Workspace reikšmę. Numatyta `0.5`; priimami tik teigiami skaičiai.
+
+Taip pat galite įrašyti į `settings.json`:
+
+```json
+"draw-inline.smallStrokeWidth": 0.75
+```
+
+Pakeitimas taikomas iškart, taip pat jau atidaryto piešinio `S` figūroms ir SVG eksportui. Perkompiliuoti ar perkrauti langą po kiekvieno nustatymo pakeitimo nereikia. Laisvam piešimui tldraw vis dar prideda `1`: reikšmė `0.75` reiškia bazinį `1.75` renderinimo plotį. `2` atkuria originalią `S` bazinę reikšmę.
+
+Patikra: nenutraukę piešinio redagavimo pakeiskite reikšmę iš `0.5` į `2` ir atgal. Patikrinkite jau nupieštą ir naują `S` liniją, išsaugokite SVG, atverkite jį iš naujo ir išbandykite Undo. `M/L/XL` turi likti nepakitę.
+
+`npm.cmd test` tikrina nustatymo perdavimą, pakeitimus, netinkamas reikšmes ir tikrą tldraw geometrijos podėlį. Visa VS Code vaizdinė sąveika lieka rankiniam bandymui.
 
 ## GitHub ir generuojami failai
 

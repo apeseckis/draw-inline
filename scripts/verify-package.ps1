@@ -17,6 +17,10 @@ try {
         throw 'Extension identity changed'
     }
     $null = Read-Entry 'extension/src/extension.js'
+    $setting = $manifest.contributes.configuration.properties.'draw-inline.smallStrokeWidth'
+    if ($setting.type -ne 'number' -or $setting.default -ne 0.5 -or $setting.exclusiveMinimum -ne 0) {
+        throw 'Small stroke width setting schema missing or incorrect'
+    }
     $null = Read-Entry 'extension.vsixmanifest'
     $html = Read-Entry 'extension/board/index.html'
     $jsMatch = [regex]::Match($html, 'src="\./assets/([^"]+\.js)"')
@@ -24,7 +28,9 @@ try {
     if (!$jsMatch.Success -or !$cssMatch.Success) { throw 'Webview entry references missing' }
     $js = Read-Entry ('extension/board/assets/' + $jsMatch.Groups[1].Value)
     $null = Read-Entry ('extension/board/assets/' + $cssMatch.Groups[1].Value)
-    if ($js -notmatch '\w+\.s=\.5') { throw 'Thin S assignment missing from bundle' }
+    if ($js -notmatch 'draw-inline\.smallStrokeWidth"\s*,\s*\.5' -or $js -notmatch 'Object\.defineProperty\([^,]+,"s"') {
+        throw 'Reactive S width setting missing from bundle'
+    }
     if ([regex]::Matches($js, 'setStyleForNextShapes\([^,]+,"s"\)').Count -lt 2) {
         throw 'Expected S defaults after mount and snapshot load'
     }
@@ -45,6 +51,6 @@ try {
             }
         }
     } finally { $sha.Dispose() }
-    Write-Host "PASS: extension identity, entry point, JS/CSS, S=0.5, S defaults, local URLs, $($assets.Count) matching local assets."
+    Write-Host "PASS: extension identity, entry point, JS/CSS, configurable S width, S defaults, local URLs, $($assets.Count) matching local assets."
     Write-Host "VSIX entries: $($archive.Entries.Count)"
 } finally { $archive.Dispose() }

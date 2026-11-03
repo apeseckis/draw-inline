@@ -54,6 +54,18 @@ function activate(context) {
   let currentText = "";
   let updateHandle = undefined;
 
+  function pushSettings() {
+    const value = vscode.workspace.getConfiguration('draw-inline').get('smallStrokeWidth', 0.5);
+    const smallStrokeWidth = typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0.5;
+    if (currentPanel) {
+      currentPanel.webview.postMessage({ command: 'settings', smallStrokeWidth });
+    }
+  }
+
+  context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+    if (event.affectsConfiguration('draw-inline.smallStrokeWidth')) pushSettings();
+  }));
+
   function createNewPanel() {
     // Create and show panel
     currentPanel = vscode.window.createWebviewPanel(
@@ -73,6 +85,9 @@ function activate(context) {
       message => {
 
         switch (message.command) {
+          case 'requestSettings':
+            pushSettings()
+            return;
           case 'requestCurrentLine':
             pushCurrentLine()
             return;
