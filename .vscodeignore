@@ -3,3 +3,4 @@
 .gitignore
 node_modules/@types/**
 webview-src/**
+scripts/**

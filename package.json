@@ -7,10 +7,10 @@
 	"icon": "img_md/icon.png",
 	"license": "MIT",
 	"repository": {
-		"url": "https://github.com/zhaouv/vscode-markdown-tldraw-inline.git"
+		"url": "https://github.com/apeseckis/draw-inline.git"
 	},
 	"bugs": {
-		"url": "https://github.com/zhaouv/vscode-markdown-tldraw-inline/issues"
+		"url": "https://github.com/apeseckis/draw-inline/issues"
 	},
 	"engines": {
 		"vscode": "^1.47.0"
@@ -63,7 +63,11 @@
 			}
 		}
 	},
-	"scripts": {},
+	"scripts": {
+		"build": "npm --prefix webview-src run build",
+		"vscode:prepublish": "npm run build",
+		"package": "npx --yes @vscode/vsce@4.1.0 package --out vscode-markdown-tldraw-inline-thin-stroke-0.1.0.vsix"
+	},
 	"dependencies": {},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",

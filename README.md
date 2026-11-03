@@ -1,5 +1,9 @@
 # Draw Inline
 
+Ši saugykla yra [zhaouv/vscode-markdown-tldraw-inline](https://github.com/zhaouv/vscode-markdown-tldraw-inline) modifikacija su plonesniu `S` brūkšniu. `origin` yra `apeseckis/draw-inline`, o `upstream` – pradinis projektas; pradinė Git istorija išsaugota.
+
+Kūrimo, diegimo, patikros ir grįžimo prie originalo instrukcijos: [Plonesnis brūkšnys](docs/THIN-STROKE.lt.md).
+
 This project is a fork of [Draw Note (zhaouv/vscode-markdown-draw)](https://github.com/zhaouv/vscode-markdown-draw) and changes to [tldraw](https://github.com/tldraw/tldraw) as the whiteboard engine.
 
 ## Compared with the Official tldraw VSCode Extension

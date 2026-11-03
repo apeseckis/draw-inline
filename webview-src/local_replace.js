@@ -1,72 +1,27 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
-function copyFile(src, dest) {
-  const readStream = fs.createReadStream(src);
-  const writeStream = fs.createWriteStream(dest);
-
-  readStream.pipe(writeStream);
-}
-
-function copyDir(src, dest) {
-  fs.mkdirSync(dest, { recursive: true }); 
-
-  const files = fs.readdirSync(src);
-  files.forEach(file => {
-    const srcPath = path.join(src, file);
-    const destPath = path.join(dest, file);
-    const stat = fs.statSync(srcPath);
-
-    if (stat.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      copyFile(srcPath, destPath);
-    }
-  });
-}
-
-const sourceDir = 'node_modules/@tldraw/assets';
-const targetDir = '../board/cdn';
-copyDir(sourceDir, targetDir);
-
-/////////////////////
-
-var jsname=''
-fs.readFile('../board/index.html', 'utf8', (err, data) => {
-    if (err) {
-    console.error(err);
-    return;
-    }
-    
-    const result = data.replace(/"\/assets\//g, '"./assets/');
-    jsname=/index-\w+.js/.exec(data)[0]
-    
-    fs.writeFile('../board/index.html', result, 'utf8', (err) => {
-    if (err) {
-        console.error(err);
-    } else {
-
-        console.log('jsname',jsname)
-        jsname='../board/assets/'+jsname
-        fs.readFile(jsname, 'utf8', (err, data) => {
-            if (err) {
-            console.error(err);
-            return;
-            }
-            
-            // const result = data.replace(/https:\/\/cdn.tldraw.com/g, '../dist');
-            const result = data.replace(/return`\${\w+}\/\${\w+}`/g, 'return`./cdn`');
-            
-            fs.writeFile(jsname, result, 'utf8', (err) => {
-            if (err) {
-                console.error(err);
-            } else {
-                console.log('File has been saved with replacements.');
-            }
-            });
-        });
-    }
-    });
+const board = path.resolve(__dirname, '../board');
+// Synchronous operations make missing assets / failed replacements fail the build.
+fs.cpSync(path.join(__dirname, 'node_modules/@tldraw/assets'), path.join(board, 'cdn'), {
+  recursive: true,
 });
 
+const htmlPath = path.join(board, 'index.html');
+const html = fs.readFileSync(htmlPath, 'utf8');
+const script = /\/assets\/(index-[\w-]+\.js)/.exec(html);
+if (!script) throw new Error('Cannot find the generated webview script');
+fs.writeFileSync(htmlPath, html.replace(/"\/assets\//g, '"./assets/'));
 
+const scriptPath = path.join(board, 'assets', script[1]);
+const source = fs.readFileSync(scriptPath, 'utf8');
+let replacements = 0;
+const localSource = source.replace(/return`\$\{\w+\}\/\$\{\w+\}`/g, () => {
+  replacements++;
+  return 'return`./cdn`';
+});
+if (replacements !== 1) {
+  throw new Error(`Expected one tldraw asset URL replacement, got ${replacements}`);
+}
+fs.writeFileSync(scriptPath, localSource);
+console.log(`Local assets ready: ${script[1]}`);

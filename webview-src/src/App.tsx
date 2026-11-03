@@ -1,6 +1,10 @@
 // import React from 'react';
-import { TLUiOverrides, TLComponents, Tldraw } from 'tldraw'
+import { DefaultSizeStyle, STROKE_SIZES, TLUiOverrides, TLComponents, Tldraw } from 'tldraw'
 import 'tldraw/tldraw.css'
+
+// Shared by the canvas and SVG exporter in tldraw 3.5.1.
+// Freehand rendering adds 1 to this base width (0.5 + 1 = 1.5).
+STROKE_SIZES.s = 0.5
 
 ////////////////////lzstring////////////////////
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
@@ -130,6 +134,7 @@ const saveBundleSvg = ()=>{
 const loadBundleSvg = (svgtext)=>{
     let payload=/<!-- draw-start -->([^<]+)<!-- draw-end -->/.exec(svgtext)[1]
     editor_g.loadSnapshot(JSON.parse(LZString.decompressFromBase64(payload)))
+    editor_g.setStyleForNextShapes(DefaultSizeStyle, 's')
 }
 globalThis.LZString=LZString
 globalThis.saveBundleSvg=saveBundleSvg
@@ -210,7 +215,11 @@ const App = () => {
             <div style={{ position: 'fixed', inset: 0 }}>
                 <Tldraw 
                     components={components}
-                    onMount={(editor) => {globalThis.editor_g=editor;globalThis?.editor_mounted?.call()}}
+                    onMount={(editor) => {
+                        globalThis.editor_g = editor
+                        editor.setStyleForNextShapes(DefaultSizeStyle, 's')
+                        globalThis?.editor_mounted?.call()
+                    }}
                     options={{ maxPages: 1 }}
                     overrides={overrides}
                     persistenceKey="tldrawinline"
