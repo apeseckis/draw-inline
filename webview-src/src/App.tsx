@@ -1,6 +1,6 @@
 // import React from 'react';
 import { DefaultSizeStyle, TLUiOverrides, TLComponents, Tldraw } from 'tldraw'
-import { applySmallStrokeWidth, configurableShapeUtils } from './smallStrokeWidth'
+import { applySmallStrokeWidth } from './smallStrokeWidth'
 import 'tldraw/tldraw.css'
 
 ////////////////////lzstring////////////////////
@@ -215,7 +215,6 @@ const App = () => {
         <div>
             <div style={{ position: 'fixed', inset: 0 }}>
                 <Tldraw 
-                    shapeUtils={configurableShapeUtils}
                     components={components}
                     onMount={(editor) => {
                         globalThis.editor_g = editor

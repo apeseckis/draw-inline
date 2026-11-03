@@ -2,7 +2,7 @@
 
 ## Pakeitimai
 
-- `webview-src/src/smallStrokeWidth.ts`: `S` bazinis plotis valdomas nustatymu, numatyta `0.5`. Pakeitus plotį atnaujinamas tldraw podėlis nekeičiant figūrų duomenų ar atšaukimo istorijos. Kiti dydžiai lieka `M=3.5`, `L=5`, `XL=10`.
+- `webview-src/src/smallStrokeWidth.ts`: `S` bazinis plotis valdomas nustatymu, numatyta `0.5`. Pakeitus plotį atnaujinamas tldraw podėlis nekeičiant figūrų duomenų ar atšaukimo istorijos. Stebimi esamų standartinių klasių renderinimo metodai; papildomos figūrų klasės neregistruojamos, nes tldraw 3.5.1 jas pridėtų prie standartinių ir dubliuotų tipus. Kiti dydžiai lieka `M=3.5`, `L=5`, `XL=10`.
 - `webview-src/src/App.tsx`: gauna nustatymą iš VS Code. `S` parenkamas redaktoriaus paleidimo metu ir po kiekvieno SVG momentinės kopijos įkėlimo. Vėliau dydį galima keisti įprastais valdikliais.
 - `src/extension.js`: perduoda nustatymą atidarius redaktorių ir pasikeitus VS Code konfigūracijai. Netinkama reikšmė pakeičiama numatytąja `0.5`.
 - `webview-src/package.json`: pašalinta Unix komanda `rm -rf`; `vite build --emptyOutDir` išvalo generuojamą `board` aplanką ir veikia Windows.

@@ -17,11 +17,8 @@ const { applySmallStrokeWidth } = moduleExports;
 
 test('width changes invalidate real tldraw geometry without changing serialized shapes', () => {
     const { STROKE_SIZES, createTLStore, DrawShapeUtil } = tldraw;
-    const store = createTLStore({ shapeUtils: moduleExports.configurableShapeUtils });
-    const ConfigurableDraw = moduleExports.configurableShapeUtils.find(Util => Util.type === DrawShapeUtil.type);
-    assert.equal(ConfigurableDraw.props, DrawShapeUtil.props);
-    assert.equal(ConfigurableDraw.migrations, DrawShapeUtil.migrations);
-    const util = new ConfigurableDraw({});
+    const store = createTLStore({ shapeUtils: tldraw.defaultShapeUtils });
+    const util = new DrawShapeUtil({});
     const makeShape = (id, size) => store.schema.types.shape.create({
         id, type: 'draw', parentId: 'page:page', index: 'a1',
         props: { ...util.getDefaultProps(), size, segments: [{ type: 'free', points: [{ x: 0, y: 0, z: 0.5 }] }] },
@@ -50,6 +47,23 @@ test('width changes invalidate real tldraw geometry without changing serialized 
     applySmallStrokeWidth(2); // settings can arrive before the editor mounts
     assert.equal(STROKE_SIZES.s, 2);
     applySmallStrokeWidth(0.5);
+});
+
+test('App lets Tldraw register its defaults without duplicate shape types', () => {
+    const appExports = {};
+    vm.runInNewContext(ts.transpileModule(
+        fs.readFileSync(path.join(root, 'webview-src/src/App.tsx'), 'utf8'),
+        { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX } }
+    ).outputText, {
+        exports: appExports,
+        require: id => id === './smallStrokeWidth' ? moduleExports : id.endsWith('.css') ? {} : frontendRequire(id),
+        addEventListener() {}, console,
+    });
+    const editorElement = appExports.default().props.children.props.children;
+    assert.equal(editorElement.type, tldraw.Tldraw);
+    const allUtils = [...tldraw.defaultShapeUtils, ...(editorElement.props.shapeUtils ?? [])];
+    assert.equal(new Set(allUtils.map(Util => Util.type)).size, allUtils.length);
+    assert.doesNotThrow(() => tldraw.createTLStore({ shapeUtils: allUtils }));
 });
 
 test('backend sends initial settings, live changes and safe defaults', () => {
